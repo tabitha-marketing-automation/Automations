@@ -1,0 +1,443 @@
+{
+  "name": "Lead Management System",
+  "flow": [
+    {
+      "id": 1,
+      "module": "hubspotcrm:watchContacts",
+      "version": 2,
+      "parameters": {
+        "__IMTCONN__": "YOUR_HUBSPOT_CONNECTION",
+        "outputProperties": [
+          "email",
+          "firstname",
+          "company",
+          "jobtitle",
+          "company_size",
+          "interest",
+          "lifecyclestage",
+          "lead_score"
+        ],
+        "limit": 10,
+        "parseCustomFields": true
+      },
+      "mapper": {}
+    },
+    {
+      "id": 2,
+      "module": "util:SetVariables",
+      "version": 1,
+      "parameters": {},
+      "mapper": {
+        "variables": [
+          {
+            "name": "emailType",
+            "value": "{{if(contains(split(\"gmail.com;yahoo.com;outlook.com;hotmail.com;icloud.com\"; \";\"); lower(last(split(1.properties.email; \"@\")))); \"Free email\"; \"Company email\")}}"
+          },
+          {
+            "name": "seniority",
+            "value": "{{if(contains(lower(1.properties.jobtitle); \"head\") | contains(lower(1.properties.jobtitle); \"director\") | contains(lower(1.properties.jobtitle); \"vp\") | contains(lower(1.properties.jobtitle); \"chief\") | contains(lower(1.properties.jobtitle); \"founder\"); \"Senior\"; if(contains(lower(1.properties.jobtitle); \"manager\") | contains(lower(1.properties.jobtitle); \"lead\"); \"Manager\"; \"Specialist\"))}}"
+          },
+          {
+            "name": "sizePoints",
+            "value": "{{switch(1.properties.company_size; \"50+\"; 20; \"10-49\"; 10; 0)}}"
+          },
+          {
+            "name": "interestPoints",
+            "value": "{{switch(1.properties.interest; \"Automation\"; 15; 0)}}"
+          }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "module": "util:SetVariables",
+      "version": 1,
+      "parameters": {},
+      "mapper": {
+        "variables": [
+          {
+            "name": "score",
+            "value": "{{2.sizePoints + 2.interestPoints + if(2.emailType = \"Free email\"; -10; 10) + if(2.seniority = \"Specialist\"; 0; 20)}}"
+          }
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "module": "util:SetVariables",
+      "version": 1,
+      "parameters": {},
+      "mapper": {
+        "variables": [
+          {
+            "name": "stage",
+            "value": "{{if(3.score >= 60; \"SQL\"; if(3.score >= 30; \"MQL\"; \"Lead\"))}}"
+          },
+          {
+            "name": "lifecycle",
+            "value": "{{if(3.score >= 60; \"salesqualifiedlead\"; if(3.score >= 30; \"marketingqualifiedlead\"; \"lead\"))}}"
+          }
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "module": "google-sheets:addRow",
+      "version": 2,
+      "parameters": {
+        "__IMTCONN__": "YOUR_GOOGLE_CONNECTION"
+      },
+      "mapper": {
+        "mode": "select",
+        "from": "drive",
+        "spreadsheetId": "/YOUR_GOOGLE_SHEET_ID",
+        "sheetId": "Leads",
+        "includesHeaders": true,
+        "useColumnHeaders": false,
+        "insertUnformatted": false,
+        "valueInputOption": "USER_ENTERED",
+        "values": {
+          "0": "{{formatDate(now; \"YYYY-MM-DD\")}}",
+          "1": "{{1.properties.firstname}}",
+          "2": "{{1.properties.email}}",
+          "3": "{{1.properties.company}}",
+          "4": "{{1.properties.jobtitle}}",
+          "5": "{{1.properties.company_size}}",
+          "6": "{{1.properties.interest}}",
+          "7": "HubSpot",
+          "8": "{{2.emailType}}",
+          "9": "{{2.seniority}}",
+          "10": "{{1.properties.company_size}}",
+          "11": "{{3.score}}",
+          "12": "{{4.stage}}"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "module": "hubspotcrm:updateContact",
+      "version": 2,
+      "parameters": {
+        "__IMTCONN__": "YOUR_HUBSPOT_CONNECTION"
+      },
+      "mapper": {
+        "contactId": "{{1.id}}",
+        "_method": "compact",
+        "properties": [
+          {
+            "key": "lead_score",
+            "value": "{{3.score}}"
+          },
+          {
+            "key": "lifecyclestage",
+            "value": "{{4.lifecycle}}"
+          }
+        ],
+        "parseCustomFields": true
+      },
+      "onerror": [
+        {
+          "id": 13,
+          "module": "google-sheets:addRow",
+          "version": 2,
+          "parameters": {
+            "__IMTCONN__": "YOUR_GOOGLE_CONNECTION"
+          },
+          "mapper": {
+            "mode": "select",
+            "from": "drive",
+            "spreadsheetId": "/YOUR_GOOGLE_SHEET_ID",
+            "sheetId": "Errors",
+            "includesHeaders": true,
+            "useColumnHeaders": false,
+            "insertUnformatted": false,
+            "valueInputOption": "USER_ENTERED",
+            "values": {
+              "0": "{{formatDate(now; \"YYYY-MM-DD\")}}",
+              "1": "{{1.properties.email}}",
+              "2": "HubSpot update: {{error.name}} {{error.message}} {{error.detail}}",
+              "3": "no"
+            }
+          }
+        },
+        {
+          "id": 14,
+          "module": "builtin:Ignore",
+          "version": 1,
+          "parameters": {},
+          "mapper": {}
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "module": "builtin:BasicRouter",
+      "version": 1,
+      "mapper": null,
+      "routes": [
+        {
+          "flow": [
+            {
+              "id": 8,
+              "module": "mailchimp:addUpdateASubscriber",
+              "version": 2,
+              "parameters": {
+                "__IMTCONN__": "YOUR_MAILCHIMP_CONNECTION"
+              },
+              "mapper": {
+                "select": "map",
+                "list": "YOUR_MAILCHIMP_AUDIENCE_ID",
+                "email_address": "{{1.properties.email}}",
+                "createOrUpdate": true,
+                "status": "subscribed",
+                "merge_fields": [
+                  {
+                    "key": "FNAME",
+                    "value": "{{1.properties.firstname}}"
+                  }
+                ],
+                "tags": [
+                  {
+                    "name": "{{ifempty(1.properties.interest; \"no-interest\")}}",
+                    "status": "active"
+                  },
+                  {
+                    "name": "stage-lead",
+                    "status": "active"
+                  }
+                ]
+              },
+              "filter": {
+                "name": "Stage is Lead",
+                "conditions": [
+                  [
+                    {
+                      "a": "{{4.stage}}",
+                      "b": "Lead",
+                      "o": "text:equal"
+                    }
+                  ]
+                ]
+              },
+              "onerror": [
+                {
+                  "id": 15,
+                  "module": "google-sheets:addRow",
+                  "version": 2,
+                  "parameters": {
+                    "__IMTCONN__": "YOUR_GOOGLE_CONNECTION"
+                  },
+                  "mapper": {
+                    "mode": "select",
+                    "from": "drive",
+                    "spreadsheetId": "/YOUR_GOOGLE_SHEET_ID",
+                    "sheetId": "Errors",
+                    "includesHeaders": true,
+                    "useColumnHeaders": false,
+                    "insertUnformatted": false,
+                    "valueInputOption": "USER_ENTERED",
+                    "values": {
+                      "0": "{{formatDate(now; \"YYYY-MM-DD\")}}",
+                      "1": "{{1.properties.email}}",
+                      "2": "Mailchimp: {{error.name}} {{error.message}} {{error.detail}}",
+                      "3": "no"
+                    }
+                  }
+                },
+                {
+                  "id": 16,
+                  "module": "builtin:Ignore",
+                  "version": 1,
+                  "parameters": {},
+                  "mapper": {}
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "flow": [
+            {
+              "id": 9,
+              "module": "mailchimp:addUpdateASubscriber",
+              "version": 2,
+              "parameters": {
+                "__IMTCONN__": "YOUR_MAILCHIMP_CONNECTION"
+              },
+              "mapper": {
+                "select": "map",
+                "list": "YOUR_MAILCHIMP_AUDIENCE_ID",
+                "email_address": "{{1.properties.email}}",
+                "createOrUpdate": true,
+                "status": "subscribed",
+                "merge_fields": [
+                  {
+                    "key": "FNAME",
+                    "value": "{{1.properties.firstname}}"
+                  }
+                ],
+                "tags": [
+                  {
+                    "name": "{{ifempty(1.properties.interest; \"no-interest\")}}",
+                    "status": "active"
+                  },
+                  {
+                    "name": "stage-mql",
+                    "status": "active"
+                  },
+                  {
+                    "name": "nurture",
+                    "status": "active"
+                  }
+                ]
+              },
+              "filter": {
+                "name": "Stage is MQL",
+                "conditions": [
+                  [
+                    {
+                      "a": "{{4.stage}}",
+                      "b": "MQL",
+                      "o": "text:equal"
+                    }
+                  ]
+                ]
+              },
+              "onerror": [
+                {
+                  "id": 17,
+                  "module": "google-sheets:addRow",
+                  "version": 2,
+                  "parameters": {
+                    "__IMTCONN__": "YOUR_GOOGLE_CONNECTION"
+                  },
+                  "mapper": {
+                    "mode": "select",
+                    "from": "drive",
+                    "spreadsheetId": "/YOUR_GOOGLE_SHEET_ID",
+                    "sheetId": "Errors",
+                    "includesHeaders": true,
+                    "useColumnHeaders": false,
+                    "insertUnformatted": false,
+                    "valueInputOption": "USER_ENTERED",
+                    "values": {
+                      "0": "{{formatDate(now; \"YYYY-MM-DD\")}}",
+                      "1": "{{1.properties.email}}",
+                      "2": "Mailchimp: {{error.name}} {{error.message}} {{error.detail}}",
+                      "3": "no"
+                    }
+                  }
+                },
+                {
+                  "id": 18,
+                  "module": "builtin:Ignore",
+                  "version": 1,
+                  "parameters": {},
+                  "mapper": {}
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "flow": [
+            {
+              "id": 11,
+              "module": "email:ActionSendMeEmail",
+              "version": 6,
+              "filter": {
+                "name": "Stage is SQL",
+                "conditions": [
+                  [
+                    {
+                      "a": "{{4.stage}}",
+                      "b": "SQL",
+                      "o": "text:equal"
+                    }
+                  ]
+                ]
+              },
+              "parameters": {},
+              "mapper": {
+                "subject": "New SQL lead: {{1.properties.firstname}} (score {{3.score}})",
+                "html": "<p><b>New SQL lead</b></p><p>Name: {{1.properties.firstname}}<br>Company: {{1.properties.company}} ({{1.properties.company_size}})<br>Job title: {{1.properties.jobtitle}} ({{2.seniority}})<br>Interest: {{1.properties.interest}}<br>Email type: {{2.emailType}}<br>Score: {{3.score}} = size {{2.sizePoints}} + interest {{2.interestPoints}} + email {{if(2.emailType = \"Free email\"; -10; 10)}} + seniority {{if(2.seniority = \"Specialist\"; 0; 20)}}</p>"
+              }
+            },
+            {
+              "id": 10,
+              "module": "mailchimp:addUpdateASubscriber",
+              "version": 2,
+              "parameters": {
+                "__IMTCONN__": "YOUR_MAILCHIMP_CONNECTION"
+              },
+              "mapper": {
+                "select": "map",
+                "list": "YOUR_MAILCHIMP_AUDIENCE_ID",
+                "email_address": "{{1.properties.email}}",
+                "createOrUpdate": true,
+                "status": "subscribed",
+                "merge_fields": [
+                  {
+                    "key": "FNAME",
+                    "value": "{{1.properties.firstname}}"
+                  }
+                ],
+                "tags": [
+                  {
+                    "name": "{{ifempty(1.properties.interest; \"no-interest\")}}",
+                    "status": "active"
+                  },
+                  {
+                    "name": "stage-sql",
+                    "status": "active"
+                  }
+                ]
+              },
+              "onerror": [
+                {
+                  "id": 19,
+                  "module": "google-sheets:addRow",
+                  "version": 2,
+                  "parameters": {
+                    "__IMTCONN__": "YOUR_GOOGLE_CONNECTION"
+                  },
+                  "mapper": {
+                    "mode": "select",
+                    "from": "drive",
+                    "spreadsheetId": "/YOUR_GOOGLE_SHEET_ID",
+                    "sheetId": "Errors",
+                    "includesHeaders": true,
+                    "useColumnHeaders": false,
+                    "insertUnformatted": false,
+                    "valueInputOption": "USER_ENTERED",
+                    "values": {
+                      "0": "{{formatDate(now; \"YYYY-MM-DD\")}}",
+                      "1": "{{1.properties.email}}",
+                      "2": "Mailchimp: {{error.name}} {{error.message}} {{error.detail}}",
+                      "3": "no"
+                    }
+                  }
+                },
+                {
+                  "id": 20,
+                  "module": "builtin:Ignore",
+                  "version": 1,
+                  "parameters": {},
+                  "mapper": {}
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "instant": false,
+    "version": 1
+  },
+  "scheduling": {
+    "type": "indefinitely",
+    "interval": 900
+  }
+}
