@@ -10,8 +10,7 @@ These are personal projects built on free plans with dummy data. They show how I
 | Project | What it shows | Tools |
 | --- | --- | --- |
 | [Lead Management System](lead-management-system/) | Lead scoring, lifecycle stages, routing, alerts and error handling | HubSpot Free, Make, Google Sheets, Mailchimp |
-
-More projects will be added here.
+| [Japan Market Case Study](japan-market-case-study/) | How I analyse a market: site comparison, competitors, likely buyer and three tests | Desk research |
 
 ## How this repo is organised
 
