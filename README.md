@@ -2,8 +2,8 @@
 
 Hi, I'm Tabitha Williams, a B2B SaaS marketing operations and growth specialist.
 
-**Portfolio page:** [add your Notion link here]
-**Contact:** tabitha.bcn@gmail.com
+**Portfolio page:** https://app.notion.com/p/Tabitha-Williams-Marketing-Operations-Portfolio-40afaeb86fd7810c9765f8b359ba3822?source=copy_link
+**Contact:** t.automates@gmail.com
 
 These are personal projects built on free plans with dummy data. They show how I design, build, test and document marketing systems. There are no real customer results in this repo.
 
