@@ -10,6 +10,7 @@ Each automation lives in its own folder with its own README, so you can copy jus
 | Folder | What it is for | Tools |
 | --- | --- | --- |
 | [lead-capture-to-nurture](lead-capture-to-nurture/) | Capturing leads with a form, scoring them, setting Lead / MQL / SQL stages, alerting sales and sending a 3-email nurture sequence | HubSpot Free (form and CRM), Make, Google Sheets, Mailchimp |
+| [funnel-leak-finder](funnel-leak-finder/) | Showing a founder how much revenue slow or missing lead follow-up costs, using their own funnel numbers, and which fix to start with | One HTML file, no dependencies |
 | [weekly-lead-report](weekly-lead-report/) | Getting a lead summary by email every Monday without opening a dashboard | Google Sheets, Make |
 | [competitor-ad-research](competitor-ad-research/) | Seeing what competitors advertise and which ads they keep running, using the free Meta, Google and LinkedIn ad libraries | Meta Ad Library, Google Ads Transparency Center, LinkedIn Ad Library |
 | [ad-landing-page-match](ad-landing-page-match/) | Making landing pages match the ad that sent the click, and A/B testing the result | Free scorecard and test plan |

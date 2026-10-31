@@ -40,7 +40,15 @@ The scoring scenario uses about 8 Make operations per lead. The nurture scenario
 
 ## Workflow
 
-![Architecture](screenshots/architecture.png)
+![Workflow, animated](screenshots/workflow-animated.gif)
+
+[Static diagram](screenshots/architecture.png) · [MP4 version](screenshots/workflow-animated.mp4)
+
+## Live intake page
+
+The form is embedded on a public landing page that offers early-stage B2B SaaS teams a free lead-routing review: https://149661254.hs-sites-eu1.com/free-lead-routing-review
+
+Submissions go through the same flow described here. The page promises no results and no testimonials.
 
 ## Step by step
 
@@ -143,7 +151,7 @@ The blueprint contains no passwords or keys. Your own connections stay in your M
 - HubSpot can refuse to move a lifecycle stage backwards.
 - Mailchimp rejects fake-looking addresses (for example example.com). Those leads are logged in the Errors tab.
 - Polling runs every 15 minutes at most on the free plan, so scoring is not instant.
-- The HubSpot form has no consent checkbox yet. Add one before emailing real people (the form editor warns about this).
+- The form has a required consent checkbox, saved to a `Marketing consent` contact property. The nurture scenario does not yet filter on that property, so only add consenting people to the Mailchimp audience.
 - The form's Company Name goes to a HubSpot company record, not the contact's company field, so the Leads tab company column can be blank for form leads.
 - The nurture scenario uses scheduled Mailchimp campaigns because Mailchimp's free plan has no automations. It emails every audience member whose signup date matches, so keep test addresses out of a live audience. Free-plan sending limits apply.
 - The nurture log cannot show recipient counts: Mailchimp calculates them after the campaign is created.
@@ -151,6 +159,6 @@ The blueprint contains no passwords or keys. Your own connections stay in your M
 
 ## What I would improve next
 
-- Add a consent checkbox to the form.
+- Make the Make scenario skip contacts whose `Marketing consent` is not ticked.
 - Stop the nurture sequence early when a lead replies or becomes SQL.
 - Replace the keyword lists with a lookup in the Google Sheet so edits need no change in Make.

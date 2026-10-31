@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>Funnel Leak Finder</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: inputs on the left, live results on the right; stacks on phones. Palette follows the portfolio: ink, forest green, amber for leaks. */
+:root{
+  --bg:#f4f6f5;--card:#ffffff;--ink:#17201d;--muted:#58655f;--line:#d9e0dc;
+  --accent:#2f5d50;--accent-ink:#ffffff;--leak:#b45309;--leak-bg:#fdf1e3;--bar:#2f5d50;--bar-lost:#e6b987;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#101614;--card:#17201d;--ink:#e8efec;--muted:#9aa9a2;--line:#2a3733;--accent:#6fb59e;--accent-ink:#0c1512;--leak:#f0a35a;--leak-bg:#2a2016;--bar:#6fb59e;--bar-lost:#7a5a35;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#101614;--card:#17201d;--ink:#e8efec;--muted:#9aa9a2;--line:#2a3733;--accent:#6fb59e;--accent-ink:#0c1512;--leak:#f0a35a;--leak-bg:#2a2016;--bar:#6fb59e;--bar-lost:#7a5a35;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--sans);padding-block:32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+main{max-width:1080px;margin:0 auto}
+h1{font-size:clamp(28px,5vw,40px);line-height:1.12;margin:0 0 8px;text-wrap:balance;font-weight:600}
+h2{font-size:13px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:0 0 12px;font-weight:600}
+p{margin:0 0 12px;color:var(--muted)}
+.lead{max-width:62ch;margin-bottom:24px}
+.grid{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:24px;align-items:start}
+@media(max-width:820px){.grid{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}
+.stack{display:flex;flex-direction:column;gap:20px}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:14px}
+.field:last-child{margin-bottom:0}
+label{font-size:14px;font-weight:500}
+.hint{font-size:13px;color:var(--muted)}
+input[type=number],select{font:inherit;font-family:var(--mono);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 10px;width:100%;min-width:0}
+select{font-family:var(--sans)}
+input:focus-visible,select:focus-visible,a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.kpi{border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}
+.kpi b{display:block;font:500 26px/1.2 var(--mono);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.kpi span{font-size:13px;color:var(--muted)}
+.kpi.leak{background:var(--leak-bg);border-color:transparent}
+.kpi.leak b{color:var(--leak)}
+.funnel{display:flex;flex-direction:column;gap:10px}
+.stage{display:grid;grid-template-columns:130px minmax(0,1fr) 84px;gap:10px;align-items:center;font-size:14px}
+@media(max-width:480px){.stage{grid-template-columns:96px minmax(0,1fr) 64px;font-size:13px}}
+.track{height:22px;background:var(--bg);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.fill{height:100%;background:var(--bar);min-width:2px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.drop{font-size:13px;color:var(--muted);margin:-2px 0 0 140px}
+@media(max-width:480px){.drop{margin-left:106px}}
+.flag{color:var(--leak);font-weight:600}
+ul.fixes{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+ul.fixes li{border:1px solid var(--line);border-radius:10px;padding:14px}
+ul.fixes strong{display:block;margin-bottom:2px}
+ul.fixes a{color:var(--accent);font-weight:500}
+.cta{display:inline-block;background:var(--accent);color:var(--accent-ink);padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600}
+.slider{display:flex;align-items:center;gap:12px}
+.slider input{flex:1;min-width:0;accent-color:var(--accent)}
+.slider output{font-family:var(--mono);min-width:3.5ch;text-align:right}
+.note{font-size:13px;color:var(--muted)}
+</style>
+
+</head>
+<body>
+<main>
+<h1>Funnel Leak Finder</h1>
+<p class="lead">Enter your own funnel numbers. The tool shows how many leads and how much monthly revenue slip away because nobody replies in time, and which fix to start with. Everything is calculated in your browser. Nothing is sent anywhere.</p>
+
+<div class="grid">
+<div class="stack">
+  <section class="card" aria-labelledby="h-funnel">
+    <h2 id="h-funnel">Your funnel (example numbers)</h2>
+    <div class="field"><label for="visitors">Website visitors per month</label><input id="visitors" type="number" min="0" value="5000"></div>
+    <div class="row">
+      <div class="field"><label for="v2l">Visitor to lead, %</label><input id="v2l" type="number" min="0" max="100" step="0.1" value="2"></div>
+      <div class="field"><label for="l2q">Lead to qualified, %</label><input id="l2q" type="number" min="0" max="100" step="0.1" value="30"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label for="q2o">Qualified to trial or demo, %</label><input id="q2o" type="number" min="0" max="100" step="0.1" value="25"></div>
+      <div class="field"><label for="o2c">Trial or demo to paid, %</label><input id="o2c" type="number" min="0" max="100" step="0.1" value="20"></div>
+    </div>
+    <div class="field"><label for="mrr">Monthly recurring revenue per new customer ($)</label><input id="mrr" type="number" min="0" value="150"></div>
+  </section>
+
+  <section class="card" aria-labelledby="h-ops">
+    <h2 id="h-ops">How leads are handled today</h2>
+    <div class="field"><label for="noreply">Leads that get no personal reply within 24 hours, %</label><input id="noreply" type="number" min="0" max="100" value="30"><span class="hint">Check your inbox or CRM. A rough guess is fine.</span></div>
+    <div class="field"><label for="stall">Qualified leads that never get a second touch, %</label><input id="stall" type="number" min="0" max="100" value="40"></div>
+    <div class="field"><label for="speed">Typical time to first reply</label>
+      <select id="speed"><option value="fast">Under 5 minutes</option><option value="hour">Within an hour</option><option value="day" selected>Same working day</option><option value="slow">Next day or later</option></select></div>
+    <div class="field"><label for="seq">Follow-up emails after the first reply</label>
+      <select id="seq"><option value="none" selected>None, it's manual</option><option value="few">One or two, sent by hand</option><option value="auto">An automated sequence</option></select></div>
+    <div class="field"><label for="rep">Do you get a weekly lead report?</label>
+      <select id="rep"><option value="no" selected>No, I check when I remember</option><option value="yes">Yes</option></select></div>
+    <div class="field"><label for="rec">If you fixed this, what share of those lost leads would you win back? (your assumption)</label>
+      <div class="slider"><input id="rec" type="range" min="5" max="60" step="5" value="25"><output id="recout" for="rec">25%</output></div></div>
+  </section>
+</div>
+
+<div class="stack">
+  <section class="card" aria-labelledby="h-res">
+    <h2 id="h-res">What the numbers say</h2>
+    <div class="kpis">
+      <div class="kpi"><b id="k-mrr">$0</b><span>New MRR per month today</span></div>
+      <div class="kpi leak"><b id="k-lost">$0</b><span>MRR tied up in leads nobody followed up</span></div>
+      <div class="kpi"><b id="k-win">$0</b><span>MRR you could add by winning back your chosen share</span></div>
+    </div>
+    <p class="note" style="margin-top:12px" id="explain"></p>
+  </section>
+
+  <section class="card" aria-labelledby="h-fun">
+    <h2 id="h-fun">Where visitors go, per month</h2>
+    <div class="funnel" id="funnel"></div>
+    <p class="note" style="margin-top:14px">The flagged step is the weakest conversion after the lead stage. Low rates at the top of a funnel are normal, so the top step is never flagged.</p>
+  </section>
+
+  <section class="card" aria-labelledby="h-fix">
+    <h2 id="h-fix">Fix these first</h2>
+    <ul class="fixes" id="fixes"></ul>
+  </section>
+
+  <section class="card">
+    <h2>Want a second pair of eyes?</h2>
+    <p>I review how early-stage B2B SaaS teams capture, score and follow up leads, and send back three practical fixes. It's free.</p>
+    <a class="cta" href="https://149661254.hs-sites-eu1.com/free-lead-routing-review">Request a free review</a>
+  </section>
+</div>
+</div>
+</main>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var REPO="https://github.com/tabitha-marketing-automation/Automations/tree/main/";
+  var money=function(n){return "$"+Math.round(n).toLocaleString("en-US")};
+  var num=function(n){return Math.round(n).toLocaleString("en-US")};
+  var val=function(id){var v=parseFloat($(id).value);return isFinite(v)&&v>=0?v:0};
+  function calc(){
+    var visitors=val("visitors"),v2l=val("v2l")/100,l2q=val("l2q")/100,q2o=val("q2o")/100,o2c=val("o2c")/100,mrr=val("mrr");
+    var noreply=Math.min(val("noreply"),100)/100,stall=Math.min(val("stall"),100)/100,rec=val("rec")/100;
+    var leads=visitors*v2l,qual=leads*l2q,opp=qual*q2o,cust=opp*o2c;
+    var newMrr=cust*mrr;
+    var l2c=l2q*q2o*o2c;
+    var lostA=leads*noreply*l2c*mrr;
+    var lostB=qual*stall*q2o*o2c*mrr;
+    var lost=lostA+lostB;
+    $("recout").textContent=Math.round(rec*100)+"%";
+    $("k-mrr").textContent=money(newMrr);
+    $("k-lost").textContent=money(lost);
+    $("k-win").textContent=money(lost*rec);
+    $("explain").textContent="Method: "+num(leads*noreply)+" leads a month get no reply in 24 hours and "+num(qual*stall)+" qualified leads get no second touch. Each is valued at your own lead-to-paid rate ("+(l2c*100).toFixed(2)+"%) and your own revenue per customer. The two groups can overlap, so treat the total as an upper bound.";
+    var stages=[["Visitors",visitors],["Leads",leads],["Qualified",qual],["Trial or demo",opp],["Paid",cust]];
+    var rates=[null,v2l,l2q,q2o,o2c];
+    var worst=-1,wr=Infinity;
+    for(var i=2;i<5;i++){if(rates[i]<wr){wr=rates[i];worst=i}}
+    var max=Math.max(visitors,1),html="";
+    stages.forEach(function(s,i){
+      var w=Math.max(s[1]/max*100,0);
+      html+='<div class="stage"><span>'+s[0]+'</span><div class="track"><div class="fill" style="width:'+w+'%"></div></div><span class="num">'+(s[1]>=100?num(s[1]):s[1].toFixed(1))+'</span></div>';
+      if(i>0){html+='<div class="drop'+(i===worst?' flag':'')+'">'+(rates[i]*100).toFixed(1)+'% convert from the step above'+(i===worst?' (weakest step after the lead stage)':'')+'</div>'}
+    });
+    $("funnel").innerHTML=html;
+    var fixes=[];
+    var sp=$("speed").value,sq=$("seq").value,rp=$("rep").value;
+    if(sp==="day"||sp==="slow"||noreply>=.2)fixes.push(["Reply the moment a lead arrives","Route every new lead to a Slack alert with its score, and send an instant acknowledgement. "+num(leads*noreply)+" leads a month currently wait more than a day.","lead-capture-to-nurture","Lead Capture to Nurture System"]);
+    if(sq!=="auto"||stall>=.2)fixes.push(["Put a follow-up sequence behind the first reply","A short automated sequence, tailored by the lead's stated interest, covers the "+num(qual*stall)+" qualified leads a month who never get a second touch.","lead-capture-to-nurture","Lead Capture to Nurture System"]);
+    if(rp==="no")fixes.push(["Get the numbers delivered weekly","A scheduled report on new leads, stage split and average score means a leak shows up in days, not quarters.","weekly-lead-report","Weekly Lead Report"]);
+    if(v2l<.02)fixes.push(["Make the ad and the page say the same thing","Your visitor-to-lead rate is "+(v2l*100).toFixed(1)+"%. A message-match scorecard and a clean A/B plan are the cheapest first tests.","ad-landing-page-match","Ad and Landing Page Match"]);
+    if(!fixes.length)fixes.push(["Your handling looks solid","Next, look at the weakest stage in the funnel above, and measure it weekly so changes show up.","weekly-lead-report","Weekly Lead Report"]);
+    $("fixes").innerHTML=fixes.map(function(f){return '<li><strong>'+f[0]+'</strong>'+f[1]+' <a href="'+REPO+f[2]+'" target="_blank" rel="noopener">Free build guide: '+f[3]+'</a></li>'}).join("");
+  }
+  document.querySelectorAll("input,select").forEach(function(el){el.addEventListener("input",calc);el.addEventListener("change",calc)});
+  calc();
+})();
+</script>
+
+</body>
+</html>
