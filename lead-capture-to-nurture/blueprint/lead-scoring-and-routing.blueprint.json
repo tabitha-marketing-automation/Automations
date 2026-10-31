@@ -1,5 +1,5 @@
 {
-  "name": "Lead Management System",
+  "name": "Lead Capture to Nurture: scoring and routing",
   "flow": [
     {
       "id": 1,
@@ -38,8 +38,12 @@
             "value": "{{if(contains(lower(1.properties.jobtitle); \"head\") | contains(lower(1.properties.jobtitle); \"director\") | contains(lower(1.properties.jobtitle); \"vp\") | contains(lower(1.properties.jobtitle); \"chief\") | contains(lower(1.properties.jobtitle); \"founder\"); \"Senior\"; if(contains(lower(1.properties.jobtitle); \"manager\") | contains(lower(1.properties.jobtitle); \"lead\"); \"Manager\"; \"Specialist\"))}}"
           },
           {
+            "name": "sizeBand",
+            "value": "{{ifempty(1.properties.company_size; 1.properties.numemployees)}}"
+          },
+          {
             "name": "sizePoints",
-            "value": "{{switch(1.properties.company_size; \"50+\"; 20; \"10-49\"; 10; 0)}}"
+            "value": "{{switch(ifempty(1.properties.company_size; 1.properties.numemployees); \"50+\"; 20; \"50-100\"; 20; \"100-500\"; 20; \"500-1000\"; 20; \"1000+\"; 20; \"10-49\"; 10; \"5-25\"; 10; \"25-50\"; 10; 0)}}"
           },
           {
             "name": "interestPoints",
@@ -102,12 +106,12 @@
           "2": "{{1.properties.email}}",
           "3": "{{1.properties.company}}",
           "4": "{{1.properties.jobtitle}}",
-          "5": "{{1.properties.company_size}}",
+          "5": "{{2.sizeBand}}",
           "6": "{{1.properties.interest}}",
           "7": "HubSpot",
           "8": "{{2.emailType}}",
           "9": "{{2.seniority}}",
-          "10": "{{1.properties.company_size}}",
+          "10": "{{2.sizeBand}}",
           "11": "{{3.score}}",
           "12": "{{4.stage}}"
         }
@@ -194,6 +198,10 @@
                   {
                     "key": "FNAME",
                     "value": "{{1.properties.firstname}}"
+                  },
+                  {
+                    "key": "INTEREST",
+                    "value": "{{ifempty(1.properties.interest; \"none\")}}"
                   }
                 ],
                 "tags": [
@@ -274,6 +282,10 @@
                   {
                     "key": "FNAME",
                     "value": "{{1.properties.firstname}}"
+                  },
+                  {
+                    "key": "INTEREST",
+                    "value": "{{ifempty(1.properties.interest; \"none\")}}"
                   }
                 ],
                 "tags": [
@@ -360,7 +372,7 @@
               "parameters": {},
               "mapper": {
                 "subject": "New SQL lead: {{1.properties.firstname}} (score {{3.score}})",
-                "html": "<p><b>New SQL lead</b></p><p>Name: {{1.properties.firstname}}<br>Company: {{1.properties.company}} ({{1.properties.company_size}})<br>Job title: {{1.properties.jobtitle}} ({{2.seniority}})<br>Interest: {{1.properties.interest}}<br>Email type: {{2.emailType}}<br>Score: {{3.score}} = size {{2.sizePoints}} + interest {{2.interestPoints}} + email {{if(2.emailType = \"Free email\"; -10; 10)}} + seniority {{if(2.seniority = \"Specialist\"; 0; 20)}}</p>"
+                "html": "<p><b>New SQL lead</b></p><p>Name: {{1.properties.firstname}}<br>Company: {{1.properties.company}} ({{2.sizeBand}})<br>Job title: {{1.properties.jobtitle}} ({{2.seniority}})<br>Interest: {{1.properties.interest}}<br>Email type: {{2.emailType}}<br>Score: {{3.score}} = size {{2.sizePoints}} + interest {{2.interestPoints}} + email {{if(2.emailType = \"Free email\"; -10; 10)}} + seniority {{if(2.seniority = \"Specialist\"; 0; 20)}}</p>"
               }
             },
             {
@@ -380,6 +392,10 @@
                   {
                     "key": "FNAME",
                     "value": "{{1.properties.firstname}}"
+                  },
+                  {
+                    "key": "INTEREST",
+                    "value": "{{ifempty(1.properties.interest; \"none\")}}"
                   }
                 ],
                 "tags": [

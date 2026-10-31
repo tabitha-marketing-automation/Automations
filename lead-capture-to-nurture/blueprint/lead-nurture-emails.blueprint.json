@@ -1,0 +1,309 @@
+{
+  "name": "Lead Nurture Emails",
+  "metadata": {
+    "version": 1
+  },
+  "scheduling": {
+    "type": "daily",
+    "time": "09:00"
+  },
+  "flow": [
+    {
+      "id": 1,
+      "module": "util:SetVariables",
+      "version": 1,
+      "parameters": {},
+      "mapper": {
+        "variables": [
+          {
+            "name": "d0",
+            "value": "{{formatDate(now; \"YYYY-MM-DD\")}}"
+          },
+          {
+            "name": "d2",
+            "value": "{{formatDate(addDays(now; -2); \"YYYY-MM-DD\")}}"
+          },
+          {
+            "name": "d5",
+            "value": "{{formatDate(addDays(now; -5); \"YYYY-MM-DD\")}}"
+          }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "module": "builtin:BasicRouter",
+      "version": 1,
+      "mapper": null,
+      "routes": [
+        {
+          "flow": [
+            {
+              "id": 3,
+              "module": "mailchimp:makeApiCall",
+              "version": 2,
+              "parameters": {
+                "__IMTCONN__": "YOUR_MAILCHIMP_CONNECTION"
+              },
+              "mapper": {
+                "url": "/campaigns",
+                "method": "POST",
+                "body": "{\"type\": \"regular\", \"recipients\": {\"list_id\": \"YOUR_MAILCHIMP_AUDIENCE_ID\", \"segment_opts\": {\"match\": \"all\", \"conditions\": [{\"condition_type\": \"Date\", \"field\": \"timestamp_opt\", \"op\": \"is\", \"value\": \"{{1.d0}}\"}]}}, \"settings\": {\"subject_line\": \"Welcome: how this lead scoring setup works\", \"preview_text\": \"Two short emails on scoring leads with free tools\", \"title\": \"Nurture 1 welcome {{formatDate(now; \\\"YYYY-MM-DD HH:mm\\\")}}\", \"from_name\": \"YOUR NAME\", \"reply_to\": \"YOUR_EMAIL\"}}"
+              }
+            },
+            {
+              "id": 4,
+              "module": "mailchimp:makeApiCall",
+              "version": 2,
+              "parameters": {
+                "__IMTCONN__": "YOUR_MAILCHIMP_CONNECTION"
+              },
+              "mapper": {
+                "url": "/campaigns/{{3.body.id}}/content",
+                "method": "PUT",
+                "body": "{\"html\": \"<p>Hi *|FNAME|*,</p><p>Thanks for signing up. Over the next few days I will send two short emails on how small SaaS teams can score and sort leads using free tools.</p><p>The full setup, with the Make blueprint and the Google Sheet template, is on GitHub: <a href='https://github.com/tabitha-marketing-automation/Automations'>github.com/tabitha-marketing-automation/Automations</a></p><p>Tabitha</p><p style='font-size:12px;color:#777'>*|LIST:ADDRESSLINE|*<br><a href='*|UNSUB|*'>Unsubscribe</a></p>\"}"
+              }
+            },
+            {
+              "id": 5,
+              "module": "mailchimp:makeApiCall",
+              "version": 2,
+              "parameters": {
+                "__IMTCONN__": "YOUR_MAILCHIMP_CONNECTION"
+              },
+              "mapper": {
+                "url": "/campaigns/{{3.body.id}}/actions/send",
+                "method": "POST",
+                "body": "{}"
+              },
+              "onerror": [
+                {
+                  "id": 23,
+                  "module": "mailchimp:makeApiCall",
+                  "version": 2,
+                  "parameters": {
+                    "__IMTCONN__": "YOUR_MAILCHIMP_CONNECTION"
+                  },
+                  "mapper": {
+                    "url": "/campaigns/{{3.body.id}}",
+                    "method": "DELETE"
+                  }
+                },
+                {
+                  "id": 24,
+                  "module": "builtin:Ignore",
+                  "version": 1,
+                  "parameters": {},
+                  "mapper": {}
+                }
+              ]
+            },
+            {
+              "id": 6,
+              "module": "google-sheets:addRow",
+              "version": 2,
+              "parameters": {
+                "__IMTCONN__": "YOUR_GOOGLE_CONNECTION"
+              },
+              "mapper": {
+                "from": "drive",
+                "mode": "select",
+                "values": {
+                  "0": "{{formatDate(now; \"YYYY-MM-DD\")}}",
+                  "1": "1 welcome",
+                  "2": "{{3.body.id}}",
+                  "3": "see Mailchimp report",
+                  "4": "sent"
+                },
+                "sheetId": "Nurture log",
+                "spreadsheetId": "/YOUR_GOOGLE_SHEET_ID",
+                "includesHeaders": true,
+                "useColumnHeaders": false,
+                "valueInputOption": "USER_ENTERED",
+                "insertUnformatted": false
+              }
+            }
+          ]
+        },
+        {
+          "flow": [
+            {
+              "id": 7,
+              "module": "mailchimp:makeApiCall",
+              "version": 2,
+              "parameters": {
+                "__IMTCONN__": "YOUR_MAILCHIMP_CONNECTION"
+              },
+              "mapper": {
+                "url": "/campaigns",
+                "method": "POST",
+                "body": "{\"type\": \"regular\", \"recipients\": {\"list_id\": \"YOUR_MAILCHIMP_AUDIENCE_ID\", \"segment_opts\": {\"match\": \"all\", \"conditions\": [{\"condition_type\": \"Date\", \"field\": \"timestamp_opt\", \"op\": \"is\", \"value\": \"{{1.d2}}\"}]}}, \"settings\": {\"subject_line\": \"How scoring decides who to call first\", \"preview_text\": \"The idea behind the setup, in plain English\", \"title\": \"Nurture 2 day 2 {{formatDate(now; \\\"YYYY-MM-DD HH:mm\\\")}}\", \"from_name\": \"YOUR NAME\", \"reply_to\": \"YOUR_EMAIL\"}}"
+              }
+            },
+            {
+              "id": 8,
+              "module": "mailchimp:makeApiCall",
+              "version": 2,
+              "parameters": {
+                "__IMTCONN__": "YOUR_MAILCHIMP_CONNECTION"
+              },
+              "mapper": {
+                "url": "/campaigns/{{7.body.id}}/content",
+                "method": "PUT",
+                "body": "{\"html\": \"<p>Hi *|FNAME|*,</p>*|IF:INTEREST=Automation|*<p>You said you are interested in automation. The idea behind this setup is simple: every new lead gets a score from company size, job seniority, interest and email type, and the score decides who gets a sales alert and who gets nurtured.</p>*|ELSEIF:INTEREST=Analytics|*<p>You said you are interested in analytics. The setup logs every lead to a Google Sheet with its score and stage, and a Monday email summarises new leads, stage counts and the average score.</p>*|ELSE:|*<p>You said you are interested in content. Because every lead is tagged by interest, you can see which topics bring in the leads that score highest, and write more of those.</p>*|END:IF|*<p>You can copy the scoring rules and change them to fit your own product.</p><p>Tabitha</p><p style='font-size:12px;color:#777'>*|LIST:ADDRESSLINE|*<br><a href='*|UNSUB|*'>Unsubscribe</a></p>\"}"
+              }
+            },
+            {
+              "id": 9,
+              "module": "mailchimp:makeApiCall",
+              "version": 2,
+              "parameters": {
+                "__IMTCONN__": "YOUR_MAILCHIMP_CONNECTION"
+              },
+              "mapper": {
+                "url": "/campaigns/{{7.body.id}}/actions/send",
+                "method": "POST",
+                "body": "{}"
+              },
+              "onerror": [
+                {
+                  "id": 27,
+                  "module": "mailchimp:makeApiCall",
+                  "version": 2,
+                  "parameters": {
+                    "__IMTCONN__": "YOUR_MAILCHIMP_CONNECTION"
+                  },
+                  "mapper": {
+                    "url": "/campaigns/{{7.body.id}}",
+                    "method": "DELETE"
+                  }
+                },
+                {
+                  "id": 28,
+                  "module": "builtin:Ignore",
+                  "version": 1,
+                  "parameters": {},
+                  "mapper": {}
+                }
+              ]
+            },
+            {
+              "id": 10,
+              "module": "google-sheets:addRow",
+              "version": 2,
+              "parameters": {
+                "__IMTCONN__": "YOUR_GOOGLE_CONNECTION"
+              },
+              "mapper": {
+                "from": "drive",
+                "mode": "select",
+                "values": {
+                  "0": "{{formatDate(now; \"YYYY-MM-DD\")}}",
+                  "1": "2 day 2",
+                  "2": "{{7.body.id}}",
+                  "3": "see Mailchimp report",
+                  "4": "sent"
+                },
+                "sheetId": "Nurture log",
+                "spreadsheetId": "/YOUR_GOOGLE_SHEET_ID",
+                "includesHeaders": true,
+                "useColumnHeaders": false,
+                "valueInputOption": "USER_ENTERED",
+                "insertUnformatted": false
+              }
+            }
+          ]
+        },
+        {
+          "flow": [
+            {
+              "id": 11,
+              "module": "mailchimp:makeApiCall",
+              "version": 2,
+              "parameters": {
+                "__IMTCONN__": "YOUR_MAILCHIMP_CONNECTION"
+              },
+              "mapper": {
+                "url": "/campaigns",
+                "method": "POST",
+                "body": "{\"type\": \"regular\", \"recipients\": {\"list_id\": \"YOUR_MAILCHIMP_AUDIENCE_ID\", \"segment_opts\": {\"match\": \"all\", \"conditions\": [{\"condition_type\": \"Date\", \"field\": \"timestamp_opt\", \"op\": \"is\", \"value\": \"{{1.d5}}\"}]}}, \"settings\": {\"subject_line\": \"A quick question about your lead process\", \"preview_text\": \"Reply and I will tell you what to change\", \"title\": \"Nurture 3 day 5 {{formatDate(now; \\\"YYYY-MM-DD HH:mm\\\")}}\", \"from_name\": \"YOUR NAME\", \"reply_to\": \"YOUR_EMAIL\"}}"
+              }
+            },
+            {
+              "id": 12,
+              "module": "mailchimp:makeApiCall",
+              "version": 2,
+              "parameters": {
+                "__IMTCONN__": "YOUR_MAILCHIMP_CONNECTION"
+              },
+              "mapper": {
+                "url": "/campaigns/{{11.body.id}}/content",
+                "method": "PUT",
+                "body": "{\"html\": \"<p>Hi *|FNAME|*,</p><p>One question: which CRM and email tool does your team use today?</p><p>Reply to this email with your tool stack and a sentence on how you sort leads now, and I will tell you which parts of this setup you could reuse and what you would need to change.</p><p>Tabitha</p><p style='font-size:12px;color:#777'>*|LIST:ADDRESSLINE|*<br><a href='*|UNSUB|*'>Unsubscribe</a></p>\"}"
+              }
+            },
+            {
+              "id": 13,
+              "module": "mailchimp:makeApiCall",
+              "version": 2,
+              "parameters": {
+                "__IMTCONN__": "YOUR_MAILCHIMP_CONNECTION"
+              },
+              "mapper": {
+                "url": "/campaigns/{{11.body.id}}/actions/send",
+                "method": "POST",
+                "body": "{}"
+              },
+              "onerror": [
+                {
+                  "id": 31,
+                  "module": "mailchimp:makeApiCall",
+                  "version": 2,
+                  "parameters": {
+                    "__IMTCONN__": "YOUR_MAILCHIMP_CONNECTION"
+                  },
+                  "mapper": {
+                    "url": "/campaigns/{{11.body.id}}",
+                    "method": "DELETE"
+                  }
+                },
+                {
+                  "id": 32,
+                  "module": "builtin:Ignore",
+                  "version": 1,
+                  "parameters": {},
+                  "mapper": {}
+                }
+              ]
+            },
+            {
+              "id": 14,
+              "module": "google-sheets:addRow",
+              "version": 2,
+              "parameters": {
+                "__IMTCONN__": "YOUR_GOOGLE_CONNECTION"
+              },
+              "mapper": {
+                "from": "drive",
+                "mode": "select",
+                "values": {
+                  "0": "{{formatDate(now; \"YYYY-MM-DD\")}}",
+                  "1": "3 day 5",
+                  "2": "{{11.body.id}}",
+                  "3": "see Mailchimp report",
+                  "4": "sent"
+                },
+                "sheetId": "Nurture log",
+                "spreadsheetId": "/YOUR_GOOGLE_SHEET_ID",
+                "includesHeaders": true,
+                "useColumnHeaders": false,
+                "valueInputOption": "USER_ENTERED",
+                "insertUnformatted": false
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

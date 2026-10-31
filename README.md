@@ -9,7 +9,7 @@ Each automation lives in its own folder with its own README, so you can copy jus
 
 | Folder | What it is for | Tools |
 | --- | --- | --- |
-| [lead-management-system](lead-management-system/) | Scoring new leads, setting Lead / MQL / SQL stages, tagging them in Mailchimp and alerting sales | HubSpot Free, Make, Google Sheets, Mailchimp |
+| [lead-capture-to-nurture](lead-capture-to-nurture/) | Capturing leads with a form, scoring them, setting Lead / MQL / SQL stages, alerting sales and sending a 3-email nurture sequence | HubSpot Free (form and CRM), Make, Google Sheets, Mailchimp |
 | [weekly-lead-report](weekly-lead-report/) | Getting a lead summary by email every Monday without opening a dashboard | Google Sheets, Make |
 | [competitor-ad-research](competitor-ad-research/) | Seeing what competitors advertise and which ads they keep running, using the free Meta, Google and LinkedIn ad libraries | Meta Ad Library, Google Ads Transparency Center, LinkedIn Ad Library |
 | [ad-landing-page-match](ad-landing-page-match/) | Making landing pages match the ad that sent the click, and A/B testing the result | Free scorecard and test plan |

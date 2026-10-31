@@ -23,3 +23,13 @@ Also checked:
 2. **Blank interest.** A contact with no interest gave Mailchimp a blank tag name and an error. I added `ifempty(interest; "no-interest")`.
 3. **Fake emails.** Mailchimp rejects example.com addresses and stopped the whole run. I added error handlers that log the lead to the Errors tab and continue.
 4. **Repeated rows.** Failed runs re-processed the same contacts and wrote duplicate rows in the Sheet. I cleaned the rows by hand and added the error handlers so a failed step no longer aborts the run.
+
+## Form and nurture test (31 October 2026)
+
+| Test | Input | Result |
+| --- | --- | --- |
+| Form submission, first attempt | Head of Marketing, 50-100, Automation, Gmail | Scored 25, not the expected 45. The form wrote the size band to HubSpot's `numemployees`, not `company_size`, so the size points were missing. |
+| Fix | Scoring now reads `company_size`, or `numemployees` when empty | Re-test below |
+| Form submission, after fix | Same input, new address | Scored 45, stage MQL (20 + 20 + 15 - 10) |
+| Nurture emails | One run of the test scenario (filtered to my own test addresses) | 3 campaigns created and sent, each to 2 test recipients, logged in the Nurture log tab |
+| Not tested | Delivery to an inbox, the 2-day and 5-day timing, the production scenario on a live audience | The 2-day and 5-day emails were sent on the same day for the test. The date logic (signup date equals today minus 2 or 5 days) was not exercised. |

@@ -1,0 +1,19 @@
+flowchart TB
+  F[HubSpot form<br/>Lead Capture] --> A[New contact in HubSpot Free CRM]
+  A -->|polled every 15 min| B[Make 1: clean and classify<br/>email type, seniority, size band]
+  B --> C[Make 1: score and stage<br/>Lead / MQL / SQL]
+  C --> E[(Google Sheet<br/>Leads tab)]
+  C --> H[HubSpot: write back<br/>score + lifecycle stage]
+  H --> G{Router by stage}
+  G -->|Lead| T1[Mailchimp: tags + Interest field<br/>stage-lead]
+  G -->|MQL| T2[Mailchimp: tags + Interest field<br/>stage-mql, nurture]
+  G -->|SQL| J[Email alert to sales owner] --> T3[Mailchimp: tags + Interest field<br/>stage-sql]
+  T1 --> M[(Mailchimp audience)]
+  T2 --> M
+  T3 --> M
+  M -->|daily, by signup date| N[Make 2: nurture sender<br/>day 0 welcome, day 2 tip by interest, day 5 question]
+  N --> L[(Nurture log tab)]
+  H -. on error .-> X[(Errors tab)]
+  T1 -. on error .-> X
+  T2 -. on error .-> X
+  T3 -. on error .-> X
