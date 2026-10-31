@@ -1,14 +1,45 @@
 # Lead Management System
 
-A lead scoring and routing system that runs entirely on **free plans**: HubSpot Free CRM, Make (free), Google Sheets and Mailchimp (free).
+A free lead scoring and routing setup for small B2B SaaS teams. It runs on **HubSpot Free CRM, Make (free), Google Sheets and Mailchimp (free)**. No paid plan or API key is needed.
 
-When a new contact appears in HubSpot, Make scores it, assigns a lifecycle stage (Lead, MQL or SQL), writes the score back to HubSpot, logs it in Google Sheets, tags it in Mailchimp and emails an alert for sales-ready leads. Failed records go to an Errors tab instead of stopping the flow.
+## Who it is for
 
-> This is a personal project built with dummy data. It has not been used with real leads.
+Early-stage SaaS teams (a founder, a marketer, a small sales team) that:
+- collect leads in HubSpot Free,
+- sort and prioritise them by hand, or not at all,
+- can't pay for HubSpot workflows or a marketing automation platform yet.
+
+## The problem
+
+Every new lead looks the same in the CRM. Hot leads wait in a list, cold leads get the same attention, and nobody can say why a lead was treated the way it was.
+
+## What it does
+
+When a new contact appears in HubSpot, the system automatically:
+1. **Scores it** from company size, job seniority, interest and email type.
+2. **Sets a stage:** Lead (low), MQL (worth nurturing) or SQL (ready for sales), and saves the score and stage on the HubSpot contact.
+3. **Tags it in Mailchimp** by interest and stage, so you can send the right emails.
+4. **Alerts you by email** when a lead is sales-ready, with the score breakdown.
+5. **Logs every lead** in a Google Sheet.
+6. **Records failures** in an Errors tab instead of stopping.
+
+## How it helps
+
+- Nobody sorts leads by hand.
+- Sales-ready leads are flagged within about 15 minutes.
+- Everyone uses the same written scoring rules, which you can change.
+- Failures are logged, not silent.
+- It costs nothing on free plans.
+
+## Cost and limits
+
+It uses about 8 Make operations per lead. On a plan with about 1,000 operations a month, that is roughly 120 leads a month. Free plan limits change, so check Make's pricing page.
+
+> **Status:** tested end to end with dummy data. It has not been run for a live team yet.
 
 ![Architecture](screenshots/architecture.png)
 
-## What it does
+## Step by step
 
 1. **Trigger:** Make watches HubSpot for new contacts (every 15 minutes on the free plan).
 2. **Clean and classify:** works out the email type (company or free email) and seniority (from job title keywords).
