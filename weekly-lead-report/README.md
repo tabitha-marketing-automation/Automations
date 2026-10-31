@@ -17,6 +17,18 @@ Every Monday at 08:00 it emails you:
 2. One cell on that tab builds the email text.
 3. A Make scenario (Google Sheets, then Email) runs weekly, reads that cell and sends it.
 
+## Workflow
+![Weekly lead report workflow](screenshots/workflow.png)
+
+## Screenshots
+The Report tab, calculated from the test leads:
+
+![Report tab](screenshots/report-tab.png)
+
+The Make scenario (two modules, run once successfully):
+
+![Make scenario](screenshots/make-scenario.jpg)
+
 ## Cost and limits
 Free. The scenario uses 2 operations per week on Make Free. Dates in the Leads tab must be real dates.
 

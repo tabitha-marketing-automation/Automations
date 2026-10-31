@@ -8,6 +8,10 @@ Small SaaS teams running a few ads (Meta, Google or LinkedIn) that all point to 
 ## The idea
 A visitor clicks because of one promise. If the page does not repeat that promise straight away, they leave. This is called message match.
 
+## Workflow
+![Ad and landing page match workflow](screenshots/workflow.png)
+
+
 ## What is in here
 | File | Use |
 | --- | --- |

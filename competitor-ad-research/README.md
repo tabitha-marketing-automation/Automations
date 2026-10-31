@@ -12,6 +12,10 @@ Small SaaS marketing teams that have no budget for ad-spy tools.
 | Google Ads Transparency Center | Search, YouTube and display ads by advertiser or domain | https://adstransparency.google.com/ |
 | LinkedIn Ad Library | Active LinkedIn ads by company or keyword | https://www.linkedin.com/ad-library |
 
+## Workflow
+![Competitor ad research workflow](screenshots/workflow.png)
+
+
 ## The method (20 minutes per competitor)
 1. Search the competitor name in each library. Filter to active ads in your target country.
 2. For each ad, log it in the swipe file (`swipe-file-template.csv`): hook, offer, CTA, format, start date, landing page.
@@ -21,6 +25,12 @@ Small SaaS marketing teams that have no budget for ad-spy tools.
 
 ## Example
 [`example-hubspot-meta-ads.md`](example-hubspot-meta-ads.md) is a real analysis of HubSpot's active Meta ads, taken on 31 October 2026.
+
+## Screenshot
+The Meta Ad Library search used for the example (the library interface, searched for "HubSpot", active ads, United States):
+
+![Meta Ad Library search](screenshots/meta-ad-library-hubspot.jpg)
+
 
 ## Limits
 - The libraries show what runs, not how well it performs. They have no spend or conversion data for normal ads, so run time is only a proxy.
