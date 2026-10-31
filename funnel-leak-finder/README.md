@@ -2,6 +2,10 @@
 
 A one-page calculator that shows an early-stage SaaS founder how much monthly revenue is tied up in leads nobody followed up, and which fix to start with.
 
+![Funnel Leak Finder, example numbers](screenshots/leak-finder-final-frame.png)
+
+**Live tool:** https://149661254.hs-sites-eu1.com/funnel-leak-finder (example numbers shown by default)
+
 ## Who it is for
 
 Founders and first marketing hires who get a trickle of leads, reply when they can and have no idea what that costs.

@@ -162,7 +162,7 @@ ul.fixes a{color:var(--accent);font-weight:500}
     $("funnel").innerHTML=html;
     var fixes=[];
     var sp=$("speed").value,sq=$("seq").value,rp=$("rep").value;
-    if(sp==="day"||sp==="slow"||noreply>=.2)fixes.push(["Reply the moment a lead arrives","Route every new lead to a Slack alert with its score, and send an instant acknowledgement. "+num(leads*noreply)+" leads a month currently wait more than a day.","lead-capture-to-nurture","Lead Capture to Nurture System"]);
+    if(sp==="day"||sp==="slow"||noreply>=.2)fixes.push(["Reply the moment a lead arrives","Send an email alert with the lead's score the moment a lead arrives, and an instant acknowledgement to the lead. "+num(leads*noreply)+" leads a month currently wait more than a day.","lead-capture-to-nurture","Lead Capture to Nurture System"]);
     if(sq!=="auto"||stall>=.2)fixes.push(["Put a follow-up sequence behind the first reply","A short automated sequence, tailored by the lead's stated interest, covers the "+num(qual*stall)+" qualified leads a month who never get a second touch.","lead-capture-to-nurture","Lead Capture to Nurture System"]);
     if(rp==="no")fixes.push(["Get the numbers delivered weekly","A scheduled report on new leads, stage split and average score means a leak shows up in days, not quarters.","weekly-lead-report","Weekly Lead Report"]);
     if(v2l<.02)fixes.push(["Make the ad and the page say the same thing","Your visitor-to-lead rate is "+(v2l*100).toFixed(1)+"%. A message-match scorecard and a clean A/B plan are the cheapest first tests.","ad-landing-page-match","Ad and Landing Page Match"]);
