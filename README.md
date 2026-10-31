@@ -1,16 +1,18 @@
-# Marketing Automation for Early-Stage SaaS
+# Automations
 
-Hi, I'm Tabitha Williams, a marketing automation specialist for B2B SaaS.
+Free-tool marketing automations for early-stage B2B SaaS teams, built by Tabitha Williams, marketing automation specialist.
 
-I build practical marketing automations that small teams can run on **free tools**. This repo holds the templates, setup guides and documentation so you can copy them.
+Each automation lives in its own folder with its own README, so you can copy just the one you need.
 
 **Portfolio page:** https://app.notion.com/p/Tabitha-Williams-Marketing-Operations-Portfolio-40afaeb86fd7810c9765f8b359ba3822?source=copy_link
 **Contact:** t.automates@gmail.com
 
-| Project | What it shows | Tools |
+| Folder | What it is for | Tools |
 | --- | --- | --- |
-| [Lead Management System](lead-management-system/) | A free lead scoring and routing setup for small SaaS teams: score leads, set Lead / MQL / SQL stages, tag them in Mailchimp and alert sales | HubSpot Free, Make, Google Sheets, Mailchimp |
-| [Weekly Lead Report](weekly-lead-report/) | An automatic Monday email with new leads, stage counts and average score | Google Sheets, Make |
+| [lead-management-system](lead-management-system/) | Scoring new leads, setting Lead / MQL / SQL stages, tagging them in Mailchimp and alerting sales | HubSpot Free, Make, Google Sheets, Mailchimp |
+| [weekly-lead-report](weekly-lead-report/) | Getting a lead summary by email every Monday without opening a dashboard | Google Sheets, Make |
+
+More automations will be added here, one folder each.
 
 > **Status:** tested end to end with dummy data on free plans. It has not been run for a live team yet, so there are no customer results in this repo.
 

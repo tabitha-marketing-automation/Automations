@@ -3,7 +3,7 @@
 A free way to get a lead summary in your inbox every Monday, with no dashboard to open.
 
 ## Who it is for
-Small SaaS teams that already collect scored leads in a Google Sheet (for example with the [Lead Management System](../lead-management-system/)) and want a regular pulse check.
+Small SaaS teams that already collect scored leads in a Google Sheet (for example with the [lead-management-system](../lead-management-system/)) and want a regular pulse check.
 
 ## What it does
 Every Monday at 08:00 it emails you:
