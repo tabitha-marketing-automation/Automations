@@ -1,6 +1,6 @@
 # Marketing Operations Portfolio
 
-Hi, I'm Tabitha Williams, a B2B SaaS marketing operations and growth specialist moving to Tokyo in May 2027.
+Hi, I'm Tabitha Williams, a B2B SaaS marketing operations and growth specialist.
 
 **Portfolio page:** [add your Notion link here]
 **Contact:** tabitha.bcn@gmail.com
