@@ -10,6 +10,7 @@ I build practical marketing automations that small teams can run on **free tools
 | Project | What it shows | Tools |
 | --- | --- | --- |
 | [Lead Management System](lead-management-system/) | A free lead scoring and routing setup for small SaaS teams: score leads, set Lead / MQL / SQL stages, tag them in Mailchimp and alert sales | HubSpot Free, Make, Google Sheets, Mailchimp |
+| [Weekly Lead Report](weekly-lead-report/) | An automatic Monday email with new leads, stage counts and average score | Google Sheets, Make |
 
 > **Status:** tested end to end with dummy data on free plans. It has not been run for a live team yet, so there are no customer results in this repo.
 
