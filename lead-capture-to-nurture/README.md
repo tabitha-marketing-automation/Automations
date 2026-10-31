@@ -107,6 +107,8 @@ I submitted the form with a test lead (Head of Marketing, 50-100 employees, inte
 | The HubSpot form | A form lead scored 45 and set to MQL |
 | ![Nurture scenario](screenshots/nurture-scenario.jpg) | ![Nurture log](screenshots/nurture-log-tab.png) |
 | The nurture scenario in Make (three routes, one per email) | The Nurture log tab after the test run |
+| ![Mailchimp campaigns sent](screenshots/mailchimp-nurture-campaigns-sent.jpg) | |
+| The three nurture campaigns in Mailchimp, status Sent, 2 test recipients each | |
 
 ## How to build your own copy
 
