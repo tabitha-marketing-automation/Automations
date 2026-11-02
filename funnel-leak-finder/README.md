@@ -12,12 +12,14 @@ Founders and first marketing hires who get a trickle of leads, reply when they c
 
 ## What it does
 
-The founder enters:
+The founder answers a few questions with simple counts from a typical month, so there is no percentage maths:
 
-- website visitors per month and the conversion rate at each stage (visitor to lead, lead to qualified, qualified to trial or demo, trial or demo to paid)
-- revenue per new customer
-- how many leads get no reply within 24 hours and how many qualified leads never get a second touch
+- how many people visit the website, how many get in touch, how many are a good fit, how many book a call, demo or trial, and how many become paying customers
+- what one new customer is worth each month
+- out of those who get in touch, how many get no personal reply within 24 hours, and out of the good-fit ones, how many never get a second follow-up
 - how fast they reply, whether a follow-up sequence exists and whether they get a weekly report
+
+The tool works out every percentage itself. A later step can never be larger than the one before it, so a miscounted entry is capped, not rejected.
 
 It returns:
 
