@@ -31,6 +31,14 @@ No client or company names, no revenue, pricing or fundraising figures unless th
 
 **Fact check (system):** You are a strict editor. Compare the draft to the raw thought. List every claim not traceable to the raw thought. Remove or rewrite it. Remove any AI-sounding phrases from the checklist. Remove sensitive details. Output JSON: {result: PASS|NEEDS_FOUNDER_INPUT, issues[], final_draft}.
 
+## Visuals: Claude creates them too
+
+Claude produces the finished visual, not just a brief: a branded image, a carousel, or a short animated video built from the founder's own screenshots and numbers. It writes the visual as code (HTML/SVG), which is rendered to a PNG or MP4 in the brand's colours and fonts. The title and the founder's name line stay static; only the screenshots or numbers animate.
+
+Visual rules (same restrictions as the post): no client names or logos, no emails or personal data visible in screenshots, no confidential figures. Screenshots are cropped or blurred before use, and any that cannot be made safe are replaced by a redrawn version.
+
+In the Make build, the visual step sends Claude's HTML to a render step and saves the file link back to the Notion row ("Visual file"), so the founder reviews the post and the visual together.
+
 ## Honest limits
 
-Claude writes text and visual briefs; it does not generate the image or video itself. Briefs can be turned into visuals by the founder's designer or a template. Fact checking only verifies against what the founder supplied, not the wider web.
+Visuals are designed layouts, charts and screen-recording-style animations, not photorealistic AI-generated pictures. Fact checking only verifies against what the founder supplied, not the wider web.
