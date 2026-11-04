@@ -31,6 +31,14 @@ No client or company names, no revenue, pricing or fundraising figures unless th
 
 **Fact check (system):** You are a strict editor. Compare the draft to the raw thought. List every claim not traceable to the raw thought. Remove or rewrite it. Remove any AI-sounding phrases from the checklist. Remove sensitive details. Output JSON: {result: PASS|NEEDS_FOUNDER_INPUT, issues[], final_draft}.
 
+## Brand and visual guidelines
+
+Each founder fills in a Brand and visual guidelines page in Notion once: colours (hex), fonts, layout and format, name line, logo rules, visual dos and don'ts, and content dos and don'ts. Claude reads it, together with the Rules page, before every post and every visual, and lists which guideline items it applied. The example in the template is the colour and font set of this portfolio (Brick Rust, Bone, Burnt Ink; Anton, Tinos Bold Italic, DM Sans; static title and static name line; no yellow).
+
+Content dos: lead with the result, plain sentence-case words, only facts from the raw thought, link in the first comment. Content don'ts: no invented numbers, no client names, no AI phrases, no comment-keyword calls to action, max 3 hashtags.
+
+Visual dos: real screenshots and numbers, highlight what to look at, one idea per visual, zoom in rather than leave empty space. Visual don'ts: no client data or faces, no stock or AI-generated people, no invented charts, no extra colours or fonts, no animated title.
+
 ## Visuals: Claude creates them too
 
 Claude produces the finished visual, not just a brief: a branded image, a carousel, or a short animated video built from the founder's own screenshots and numbers. It writes the visual as code (HTML/SVG), which is rendered to a PNG or MP4 in the brand's colours and fonts. The title and the founder's name line stay static; only the screenshots or numbers animate.
