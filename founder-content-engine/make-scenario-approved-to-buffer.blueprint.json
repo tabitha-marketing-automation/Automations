@@ -1,0 +1,75 @@
+{
+  "name": "Founder content engine: approved post to Buffer",
+  "flow": [
+    {
+      "id": 1,
+      "module": "notion:watchDatabaseItems",
+      "version": 1,
+      "parameters": {
+        "__IMTCONN__": 12568715,
+        "watchBy": "data_source",
+        "select": "update",
+        "limit": 5,
+        "data_source": "80d27ce5-0ace-4206-977f-adc6c81ef3a6"
+      },
+      "mapper": {}
+    },
+    {
+      "id": 2,
+      "module": "buffer:ActionCreateStatus",
+      "version": 2,
+      "parameters": {
+        "account": 12702968
+      },
+      "filter": {
+        "name": "Only Approved",
+        "conditions": [
+          [
+            {
+              "a": "{{1.properties_value.Status.name}}",
+              "b": "Approved",
+              "o": "text:equal"
+            }
+          ]
+        ]
+      },
+      "mapper": {
+        "text": "{{1.properties_value.`Final draft`[1].plain_text}}",
+        "type": "scheduled",
+        "useMedia": false,
+        "profileIds": "6aeb26a9e29c69a1715c3b73",
+        "dateScheduled": "{{1.properties_value.`Publish date`.start}}"
+      }
+    },
+    {
+      "id": 3,
+      "module": "notion:updateADatabaseItem",
+      "version": 1,
+      "parameters": {
+        "__IMTCONN__": 12568715
+      },
+      "mapper": {
+        "page": "{{1.id}}",
+        "select": "map",
+        "updateBy": "data_source",
+        "data_source": "80d27ce5-0ace-4206-977f-adc6c81ef3a6",
+        "fields": [
+          {
+            "key": "Status",
+            "type": "status",
+            "value": "Scheduled"
+          },
+          {
+            "key": "Buffer post ID",
+            "type": "rich_text",
+            "value": "{{2.statuses[1].id}}"
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "instant": false,
+    "version": 1
+  }
+}

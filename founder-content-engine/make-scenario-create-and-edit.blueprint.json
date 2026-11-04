@@ -1,0 +1,163 @@
+{
+  "name": "Founder content engine: create and edit content",
+  "flow": [
+    {
+      "id": 1,
+      "module": "notion:watchDatabaseItems",
+      "version": 1,
+      "parameters": {
+        "__IMTCONN__": 12568715,
+        "watchBy": "data_source",
+        "select": "update",
+        "limit": 3,
+        "data_source": "80d27ce5-0ace-4206-977f-adc6c81ef3a6"
+      },
+      "mapper": {}
+    },
+    {
+      "id": 2,
+      "module": "notion:listPageContents",
+      "version": 1,
+      "parameters": {
+        "__IMTCONN__": 12568715
+      },
+      "mapper": {
+        "page": "{{1.id}}",
+        "limit": 100
+      },
+      "filter": {
+        "name": "Create content or Not approved - edit",
+        "conditions": [
+          [
+            {
+              "a": "{{1.properties_value.Status.name}}",
+              "b": "Create content",
+              "o": "text:equal"
+            }
+          ],
+          [
+            {
+              "a": "{{1.properties_value.Status.name}}",
+              "b": "Not approved - edit",
+              "o": "text:equal"
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "module": "util:TextAggregator",
+      "version": 1,
+      "parameters": {
+        "feeder": 2,
+        "rowSeparator": "\n"
+      },
+      "mapper": {
+        "value": "{{join(map(2.paragraph.rich_text; \"plain_text\"); \"\")}}{{join(map(2.paragraph.text; \"plain_text\"); \"\")}}{{join(map(2.heading_1.rich_text; \"plain_text\"); \"\")}}{{join(map(2.heading_1.text; \"plain_text\"); \"\")}}{{join(map(2.heading_2.rich_text; \"plain_text\"); \"\")}}{{join(map(2.heading_2.text; \"plain_text\"); \"\")}}{{join(map(2.heading_3.rich_text; \"plain_text\"); \"\")}}{{join(map(2.heading_3.text; \"plain_text\"); \"\")}}{{join(map(2.bulleted_list_item.rich_text; \"plain_text\"); \"\")}}{{join(map(2.bulleted_list_item.text; \"plain_text\"); \"\")}}{{join(map(2.numbered_list_item.rich_text; \"plain_text\"); \"\")}}{{join(map(2.numbered_list_item.text; \"plain_text\"); \"\")}}{{join(map(2.to_do.rich_text; \"plain_text\"); \"\")}}{{join(map(2.to_do.text; \"plain_text\"); \"\")}}{{join(map(2.toggle.rich_text; \"plain_text\"); \"\")}}{{join(map(2.toggle.text; \"plain_text\"); \"\")}}"
+      }
+    },
+    {
+      "id": 4,
+      "module": "notion:listPageContents",
+      "version": 1,
+      "parameters": {
+        "__IMTCONN__": 12568715
+      },
+      "mapper": {
+        "page": "40efaeb8-6fd7-8179-a82e-dfc4d4afca65",
+        "limit": 100
+      }
+    },
+    {
+      "id": 5,
+      "module": "util:TextAggregator",
+      "version": 1,
+      "parameters": {
+        "feeder": 4,
+        "rowSeparator": "\n"
+      },
+      "mapper": {
+        "value": "{{join(map(4.paragraph.rich_text; \"plain_text\"); \"\")}}{{join(map(4.paragraph.text; \"plain_text\"); \"\")}}{{join(map(4.heading_1.rich_text; \"plain_text\"); \"\")}}{{join(map(4.heading_1.text; \"plain_text\"); \"\")}}{{join(map(4.heading_2.rich_text; \"plain_text\"); \"\")}}{{join(map(4.heading_2.text; \"plain_text\"); \"\")}}{{join(map(4.heading_3.rich_text; \"plain_text\"); \"\")}}{{join(map(4.heading_3.text; \"plain_text\"); \"\")}}{{join(map(4.bulleted_list_item.rich_text; \"plain_text\"); \"\")}}{{join(map(4.bulleted_list_item.text; \"plain_text\"); \"\")}}{{join(map(4.numbered_list_item.rich_text; \"plain_text\"); \"\")}}{{join(map(4.numbered_list_item.text; \"plain_text\"); \"\")}}{{join(map(4.to_do.rich_text; \"plain_text\"); \"\")}}{{join(map(4.to_do.text; \"plain_text\"); \"\")}}{{join(map(4.toggle.rich_text; \"plain_text\"); \"\")}}{{join(map(4.toggle.text; \"plain_text\"); \"\")}}"
+      }
+    },
+    {
+      "id": 6,
+      "module": "anthropic-claude:createAMessage",
+      "version": 1,
+      "parameters": {
+        "__IMTCONN__": 12702963
+      },
+      "mapper": {
+        "model": "claude-sonnet-5-5",
+        "messages": [
+          {
+            "role": "user",
+            "content": "You write LinkedIn posts for a founder. Follow the RULES exactly.\n\nSTATUS OF THIS PAGE: {{1.properties_value.Status.name}}\nIDEA TITLE: {{1.properties_value.Idea[1].plain_text}}\n\nRAW THOUGHT (the founder's own notes):\n{{3.text}}\n\nRULES:\n{{5.text}}\n\nIf STATUS is \"Create content\": write the LinkedIn post from the raw thought. Use ONLY facts, numbers and quotes from the raw thought. Never invent results. Remove client names, confidential figures and personal data. First line under 12 words, one idea, 120-220 words, sentence case, max 3 hashtags, no link in the body, no comment-keyword call to action, none of the banned AI phrases.\n\nIf STATUS is \"Not approved - edit\": edit the CURRENT DRAFT below strictly as the EDIT BRIEF says, keeping all rules. Change only what the brief asks for.\nCURRENT DRAFT: {{1.properties_value.`Final draft`[1].plain_text}}\nEDIT BRIEF: {{1.properties_value.`Edit brief`[1].plain_text}}\n\nOutput the post text only, nothing else.",
+            "inputType": "single"
+          }
+        ],
+        "max_tokens": 4000
+      }
+    },
+    {
+      "id": 7,
+      "module": "anthropic-claude:createAMessage",
+      "version": 1,
+      "parameters": {
+        "__IMTCONN__": 12702963
+      },
+      "mapper": {
+        "model": "claude-sonnet-5-5",
+        "messages": [
+          {
+            "role": "user",
+            "content": "You are a strict fact checker and editor for LinkedIn posts. Compare the DRAFT with the RAW THOUGHT and apply the RULES.\n\nRAW THOUGHT:\n{{3.text}}\n\nEDIT BRIEF (may be empty): {{1.properties_value.`Edit brief`[1].plain_text}}\n\nDRAFT POST:\n{{join(map(6.content; \"text\"); \"\")}}\n\nRULES:\n{{5.text}}\n\nCheck: every number, name and claim is traceable to the raw thought; no sensitive details (client names, revenue, personal data); none of the AI-sounding phrases from the checklist; no invented results; if an edit brief is given, the draft follows it.\nOutput format, nothing else: first line exactly RESULT: PASS or RESULT: NEEDS FOUNDER INPUT. Then a short report listing each issue found and what you changed (or \"No issues\"). Then a line containing exactly === FINAL DRAFT === followed by the corrected final post text only.",
+            "inputType": "single"
+          }
+        ],
+        "max_tokens": 4000
+      }
+    },
+    {
+      "id": 8,
+      "module": "notion:updateADatabaseItem",
+      "version": 1,
+      "parameters": {
+        "__IMTCONN__": 12568715
+      },
+      "mapper": {
+        "page": "{{1.id}}",
+        "select": "map",
+        "updateBy": "data_source",
+        "data_source": "80d27ce5-0ace-4206-977f-adc6c81ef3a6",
+        "fields": [
+          {
+            "key": "Fact-check report",
+            "type": "rich_text",
+            "value": "{{substring(trim(get(split(join(map(7.content; \"text\"); \"\"); \"=== FINAL DRAFT ===\"); 1)); 0; 1900)}}"
+          },
+          {
+            "key": "Final draft",
+            "type": "rich_text",
+            "value": "{{substring(trim(get(split(join(map(7.content; \"text\"); \"\"); \"=== FINAL DRAFT ===\"); 2)); 0; 1900)}}"
+          },
+          {
+            "key": "Fact check result",
+            "type": "select",
+            "value": "{{if(contains(join(map(7.content; \"text\"); \"\"); \"RESULT: PASS\"); \"Passed\"; \"Needs founder input\")}}"
+          },
+          {
+            "key": "Status",
+            "type": "status",
+            "value": "Ready for review"
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "instant": false,
+    "version": 1
+  }
+}
