@@ -1,0 +1,36 @@
+# Founder thought leadership engine (LinkedIn)
+
+A content calendar that turns a founder's raw thoughts into reviewed LinkedIn posts. The founder does two things: drops in raw thoughts, and approves the final draft. Everything between is automated.
+
+**Stack:** Notion (inputs, review, approval) → Make (orchestration) → Claude (draft, fact check) → Buffer (scheduling)
+
+## Flow
+
+| # | Status in Notion | Who | What happens |
+|---|---|---|---|
+| 1 | Raw thought | Founder | Adds a number, screenshot or client-call insight. Ticks "Contains sensitive info" if unsure |
+| 2 | Drafting | Claude | Writes the post and a visual brief (image, carousel or short video) following the Rules page |
+| 3 | Fact check | Claude | Second pass: checks every claim against the raw thought, removes sensitive details, strips AI phrases |
+| 4 | Ready for review | Founder | Edits the final draft. Approves or sets "Changes needed" |
+| 5 | Approved | Make | Sends the post to Buffer on the publish date |
+| 6 | Sent to Buffer | Make | Stores the Buffer post ID |
+
+## Make scenarios
+
+1. **Draft:** watch Notion database, filter Status = Raw thought → set Drafting → Claude draft → write Draft post + Visual brief → set Fact check.
+2. **Fact check:** filter Status = Fact check → Claude check against raw thought and Rules → write Fact-check report + Final draft → Fact check result Passed → Ready for review; otherwise Needs founder input + Changes needed.
+3. **Publish:** filter Status = Approved and Publish date set → Buffer create status (LinkedIn profile, scheduled) → Status = Sent to Buffer, store Buffer post ID.
+
+## Restrictions built into the prompts
+
+No client or company names, no revenue, pricing or fundraising figures unless the founder marks them shareable, no names/emails in screenshots, nothing under NDA, no invented numbers. Full list lives on the Rules page in Notion, which Claude reads on every run.
+
+## Claude prompts
+
+**Draft (system):** You write LinkedIn posts for a founder. Use only facts, numbers and quotes from the raw thought. Never invent results. Remove anything in the restrictions list. First line under 12 words, one idea, 120-220 words, sentence case, max 3 hashtags, link goes in the first comment. Then write a visual brief: image, carousel or short video, no real client logos or names. Output JSON: {post, visual_type, visual_brief, removed_sensitive_items}.
+
+**Fact check (system):** You are a strict editor. Compare the draft to the raw thought. List every claim not traceable to the raw thought. Remove or rewrite it. Remove any AI-sounding phrases from the checklist. Remove sensitive details. Output JSON: {result: PASS|NEEDS_FOUNDER_INPUT, issues[], final_draft}.
+
+## Honest limits
+
+Claude writes text and visual briefs; it does not generate the image or video itself. Briefs can be turned into visuals by the founder's designer or a template. Fact checking only verifies against what the founder supplied, not the wider web.
